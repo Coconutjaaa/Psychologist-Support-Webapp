@@ -1,0 +1,7 @@
+services:
+  mindflow:
+    build: .
+    ports:
+      # Host port defaults to 8090; override with MINDFLOW_PORT if it is taken.
+      - "${MINDFLOW_PORT:-8090}:80"
+    restart: unless-stopped

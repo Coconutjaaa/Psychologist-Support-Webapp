@@ -1,0 +1,63 @@
+# Builds the site and publishes it to GitHub Pages on every push to main (or when run by hand from the Actions tab).
+# One-time setup: repository Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push waits for the running one instead of cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm version comes from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # .env is not committed. The demo accounts come from the template, as in the Dockerfile; every VITE_ value
+      # ends up readable in the published site, so the template must only ever hold demo values.
+      - name: Use the demo settings from .env.example
+        run: cp .env.example .env
+
+      - run: pnpm typecheck
+
+      # base_path is "/<repo>" for a project site, or "" for a user site / custom domain.
+      - id: pages
+        uses: actions/configure-pages@v6
+
+      - run: pnpm build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
