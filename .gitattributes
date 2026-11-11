@@ -1,0 +1,4 @@
+# Text files use LF everywhere (Windows editors cope; CI and Docker run on Linux).
+* text=auto eol=lf
+*.png binary
+*.ico binary

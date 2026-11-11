@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vite/
+vite.config.*.timestamp-*
+*.tsbuildinfo
+*.log
+
+# Local settings (demo accounts, API URL). Only the template is shared.
+.env*
+!.env.example
