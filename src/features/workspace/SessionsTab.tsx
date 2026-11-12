@@ -22,7 +22,7 @@ export default function SessionsTab({ patient, uploads, onUpload, onOpenTranscri
       {[...patient.sessions].reverse().map((item) => (
         <article className="session-card" key={item.number}>
           <span className="session-num">S{item.number}</span>
-          <div className="session-copy"><strong>Session {item.number} · {thaiDate(item.date)}</strong><small>{item.duration} นาที · ความรุนแรง {item.severity}/5</small><p>{item.summary}</p></div>
+          <div className="session-copy"><strong>Session {item.number} · {thaiDate(item.date)}</strong><small>{item.duration} นาที</small><p>{item.summary}</p></div>
           <div className="session-actions">
             <button className="secondary-button" onClick={() => onOpenTranscript(item.number)}><Icon name="file" size={16} />เปิด Transcript</button>
             <button className="text-button" onClick={() => onShowInGraph(item.number)}>ดูใน Knowledge Graph <Icon name="arrow" size={15} /></button>

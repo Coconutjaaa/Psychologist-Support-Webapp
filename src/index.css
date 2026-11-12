@@ -147,7 +147,6 @@ button, select { cursor: pointer; }
 .summary-card small { color: var(--muted); font-size: 10px; }
 .summary-card strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; margin: 1px 0; }
 .summary-card p { margin: 0; color: var(--muted); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.summary-card .down { color: var(--green); font-weight: 600; }
 
 /* Knowledge Graph */
 .graph-card { border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: var(--shadow); overflow: hidden; }
@@ -200,7 +199,7 @@ button, select { cursor: pointer; }
 .timeline-row:not(:last-child)::before { content: ""; position: absolute; left: 14px; top: 28px; bottom: 0; width: 1px; background: var(--line-2); }
 .timeline-dot { z-index: 1; width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #9ecbd3; color: #4a7f89; background: var(--teal-pale); border-radius: 99px; }
 .timeline-row div { display: grid; }
-.timeline-row small { color: var(--muted); }.timeline-row strong { margin: 3px 0; }.timeline-row p { margin: 0; color: var(--green); font-size: 11px; }
+.timeline-row small { color: var(--muted); }.timeline-row strong { margin: 3px 0; }
 
 /* Patient app */
 .patient-app { min-height: calc(100vh - 68px); max-width: 1180px; margin: 0 auto; padding: 36px 28px 50px; }
@@ -501,11 +500,6 @@ button, select { cursor: pointer; }
 .info-list div:last-child { border-bottom: 0; }
 .info-list dt { color: var(--muted); }.info-list dd { margin: 0; font-weight: 600; text-align: right; }
 .panel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.severity-bars { height: 140px; display: flex; align-items: flex-end; gap: 14px; }
-.severity-bars div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
-.severity-bars span { width: 100%; max-width: 36px; border-radius: 6px 6px 2px 2px; background: #c5dfe4; }
-.severity-bars div:last-child span { background: #51919b; }
-.severity-bars b { color: var(--navy); font-size: 11px; }.severity-bars small { color: var(--muted); font-size: 10px; }
 .feed { display: grid; }
 .feed-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
 .feed-item:last-child { border-bottom: 0; }

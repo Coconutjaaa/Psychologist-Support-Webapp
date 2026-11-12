@@ -116,14 +116,12 @@ export function askKg(patient: Patient, question: string): RagAnswer {
   }
 
   if (has(intents.progress)) {
-    const first = sessions[0];
-    const scored = (focus.some((node) => node.score) ? focus : nodes).filter((node) => node.score);
-    const delta = first.severity - latest.severity;
-    const trend = delta > 0 ? `มีแนวโน้มดีขึ้น ความรุนแรงลดลงจาก ${first.severity}/5 เหลือ ${latest.severity}/5` : delta < 0 ? `มีแนวโน้มแย่ลง ความรุนแรงเพิ่มจาก ${first.severity}/5 เป็น ${latest.severity}/5` : `ความรุนแรงคงที่ที่ ${latest.severity}/5`;
+    // Change is told from the trends noted on KG nodes and each session's insight, not from a severity rating.
+    const tracked = (focus.some((node) => node.score) ? focus : nodes).filter((node) => node.score);
     return answer(
-      `ตลอด ${sessions.length} Session ${name}${trend}`,
-      [`ความรุนแรงรายครั้ง: ${sessions.map((session) => `S${session.number} ${session.severity}/5`).join(" → ")}`, ...scored.map((node) => `${node.label}: ${node.score}`)],
-      scored, [...scored.filter((node) => node.session === latest.number), ...scored]);
+      `ความเปลี่ยนแปลงของ${name}ตลอด ${sessions.length} Session`,
+      [...tracked.map((node) => `${node.label}: ${node.score}`), ...sessions.map((session) => session.insight)],
+      tracked, [...tracked.filter((node) => node.session === latest.number), ...tracked]);
   }
 
   const sessionNo = Number(q.match(/(?:session|เซสชัน|เซสชั่น|ครั้งที่)(\d+)/)?.[1] ?? 0) || (has(intents.latest) ? latest.number : 0);
@@ -134,7 +132,7 @@ export function askKg(patient: Patient, question: string): RagAnswer {
     const fresh = nodes.filter((node) => node.since === sessionNo && sessionNo > 1);
     return answer(
       `Session ${sessionNo} (${thaiDate(record.date)}): ${record.summary}`,
-      lines(`ความรุนแรง ${record.severity}/5`, record.insight, fresh.length > 0 && `ประเด็นใหม่: ${fresh.map((node) => node.label).join(", ")}`),
+      lines(record.insight, fresh.length > 0 && `ประเด็นใหม่: ${fresh.map((node) => node.label).join(", ")}`),
       related, related.filter((node) => node.session === sessionNo));
   }
 
@@ -144,7 +142,7 @@ export function askKg(patient: Patient, question: string): RagAnswer {
     return answer(
       `สรุปเคส${name} จาก ${sessions.length} Session และ ${nodes.length} ประเด็นใน Knowledge Graph`,
       lines(
-        summary && `อาการหลัก: ${summary.symptom} (ความรุนแรงล่าสุด ${latest.severity}/5)`,
+        summary && `อาการหลัก: ${summary.symptom}`,
         summary && `แก่นความเชื่อ: ${summary.belief} — ${summary.beliefNote}`,
         loop.length > 0 && `วงจรหลัก: ${chainText(loop)}`,
         helpers.length > 0 && `ปัจจัยปกป้อง: ${helpers.map((node) => node.label).join(", ")}`,

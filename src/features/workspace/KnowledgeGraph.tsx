@@ -158,7 +158,6 @@ export default function KnowledgeGraph({ patient, selected, onSelect, session, o
               <div>
                 <small>{thaiDate(item.date, { day: "numeric", month: "short" })} · Session {item.number}</small>
                 <strong>{item.summary}</strong>
-                <p>ความรุนแรง {item.severity}/5</p>
                 <button className="text-button" onClick={() => onOpenTranscript(item.number)}>เปิด Transcript <Icon name="arrow" size={15} /></button>
               </div>
             </div>

@@ -8,8 +8,8 @@ import type { Appointment, Patient } from "../../types";
 import SessionRecap from "./SessionRecap";
 
 /**
- * "ภาพรวม" tab: profile, next appointment (when `features.appointments`), severity per session, a recap of every
- * session and the latest check-ins from the patient's app.
+ * "ภาพรวม" tab: profile, next appointment (when `features.appointments`), the latest check-ins from the patient's app
+ * and a recap of every session.
  */
 export default function OverviewTab({ patient, appointment, onSchedule, onOpenTranscript }: {
   patient: Patient; appointment?: Appointment; onSchedule: (appointment?: Appointment) => void; onOpenTranscript: (session: number) => void;
@@ -28,7 +28,7 @@ export default function OverviewTab({ patient, appointment, onSchedule, onOpenTr
           <div><dt>เลขประจำตัว</dt><dd>{patient.hn}</dd></div>
           <div><dt>เริ่มรับคำปรึกษา</dt><dd>{patient.sessions[0] ? thaiDate(patient.sessions[0].date) : "ยังไม่เริ่ม"}</dd></div>
           <div><dt>จำนวน Session</dt><dd>{patient.sessions.length} ครั้ง</dd></div>
-          <div><dt>ความรุนแรงล่าสุด</dt><dd>{last ? `${last.severity}/5` : "-"}</dd></div>
+          <div><dt>Session ล่าสุด</dt><dd>{last ? thaiDate(last.date) : "-"}</dd></div>
         </dl>
       </section>
       {features.appointments && (
@@ -49,20 +49,8 @@ export default function OverviewTab({ patient, appointment, onSchedule, onOpenTr
           </div>
         </section>
       )}
-      <section className="panel">
-        <div className="panel-head"><h2>ความรุนแรงตาม Session</h2>{last && <span className="chip chip-green">ล่าสุด {last.severity}/5</span>}</div>
-        <div className="panel-body">
-          {patient.sessions.length ? (
-            <div className="severity-bars">
-              {patient.sessions.map((item) => <div key={item.number}><b>{item.severity}</b><span style={{ height: `${(item.severity / 5) * 100}%` }} /><small>S{item.number}</small></div>)}
-            </div>
-          ) : <p className="muted-text">ยังไม่มีข้อมูล Session</p>}
-        </div>
-      </section>
-      {/* Full width. With appointments on, the grid's dense flow moves the next panel up beside "ความรุนแรง". */}
-      <SessionRecap patient={patient} onOpenTranscript={onOpenTranscript} />
-      {/* Without the appointment panel this is the odd one out, so it spans the full row. */}
-      <section className={`panel ${features.appointments ? "" : "span-all"}`}>
+      {/* Sits beside the profile; with the appointment panel taking that place, it spans the full row instead. */}
+      <section className={`panel ${features.appointments ? "span-all" : ""}`}>
         <div className="panel-head"><h2>บันทึกจากแอปผู้รับคำปรึกษา</h2></div>
         <div className="panel-body feed">
           {!patient.email && <p className="muted-text">{patient.name}ยังไม่ได้เชื่อมต่อบัญชีแอป {appName}</p>}
@@ -75,6 +63,7 @@ export default function OverviewTab({ patient, appointment, onSchedule, onOpenTr
           {patient.email && checkins && !recentMoods.length && !diary.length && <p className="muted-text">ยังไม่มีบันทึกใหม่</p>}
         </div>
       </section>
+      <SessionRecap patient={patient} onOpenTranscript={onOpenTranscript} />
     </div>
   );
 }

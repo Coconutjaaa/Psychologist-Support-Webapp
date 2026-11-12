@@ -31,7 +31,7 @@ export type KgNode = {
   /** Session number and timestamp (mm:ss) of the quote. */
   session: number;
   time: string;
-  /** Latest trend, e.g. "ความรุนแรง 2/5". */
+  /** Latest trend, taken from what was said in session, e.g. "ความเชื่อลดลง 5 → 3" or "ความถี่ 4 คืน/สัปดาห์". */
   score?: string;
   /** Words used to match questions to this node in the KG chat. */
   keywords: string[];
@@ -40,7 +40,7 @@ export type KgNode = {
 /** A directed edge: [from node id, to node id, relation label]. */
 export type KgEdge = [from: string, to: string, relation: string];
 
-export type SessionRecord = { number: number; date: string; duration: number; summary: string; insight: string; severity: number };
+export type SessionRecord = { number: number; date: string; duration: number; summary: string; insight: string };
 
 export type PatientStatus = "ควรติดตาม" | "ปกติ" | "นัดหมายใหม่";
 export type PatientColor = "coral" | "mint" | "blue" | "purple";

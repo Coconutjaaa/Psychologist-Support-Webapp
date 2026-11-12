@@ -18,8 +18,8 @@ function totalTime(minutes: number) {
 const withoutSessionPrefix = (text: string) => text.replace(/^Session[^:]*:\s*/, "");
 
 /**
- * Overview block: every session in order with its key insight, the gist of its summary, severity change and the KG
- * themes it introduced. Each row expands to the full summary (key points, what was done, homework, next focus);
+ * Overview block: every session in order with its key insight, the gist of its summary and the KG themes it
+ * introduced. Each row expands to the full summary (key points, what was done, homework, next focus);
  * the latest session starts expanded.
  */
 export default function SessionRecap({ patient, onOpenTranscript }: { patient: Patient; onOpenTranscript: (session: number) => void }) {
@@ -39,8 +39,6 @@ export default function SessionRecap({ patient, onOpenTranscript }: { patient: P
       {sessions.length > 0 && !summaries.data && <div className="panel-body"><LoadState resources={[summaries]} compact /></div>}
       {sessions.map((item, index) => {
         const summary = summaries.data?.find((entry) => entry.session === item.number);
-        const previous = sessions[index - 1];
-        const change = previous ? item.severity - previous.severity : 0;
         const newThemes = patient.nodes.filter((node) => node.since === item.number);
         const latest = index === sessions.length - 1;
         const open = expanded.includes(item.number);
@@ -75,9 +73,6 @@ export default function SessionRecap({ patient, onOpenTranscript }: { patient: P
               )}
             </div>
             <div className="recap-side">
-              <span className={`chip ${change < 0 ? "chip-green" : change > 0 ? "chip-rose" : "chip-muted"}`}>
-                ความรุนแรง {item.severity}/5{change < 0 ? ` ↓${-change}` : change > 0 ? ` ↑${change}` : ""}
-              </span>
               <button className="text-button" onClick={() => onOpenTranscript(item.number)}>เปิด Transcript <Icon name="arrow" size={15} /></button>
             </div>
           </article>
