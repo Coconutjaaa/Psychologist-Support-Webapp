@@ -8,15 +8,14 @@ type Props = ComponentProps<typeof KnowledgeGraph> & { ref?: Ref<HTMLDivElement>
 /** "Knowledge Graph" tab: four case-summary cards above the graph. `ref` points at the graph, for scrolling to it. */
 export default function GraphTab({ ref, ...graphProps }: Props) {
   const { patient } = graphProps;
-  const first = patient.sessions[0];
   const last = patient.sessions[patient.sessions.length - 1];
   return (
     <>
-      {patient.summary && first && last && (
+      {patient.summary && last && (
         <div className="summary-grid">
           <article className="summary-card">
             <span className="summary-icon summary-rose"><Icon name="activity" /></span>
-            <div><small>อาการหลัก</small><strong>{patient.summary.symptom}</strong><p>{first.severity > last.severity ? <><span className="down">↓ {first.severity - last.severity} ระดับ</span> จาก Session แรก</> : `ความรุนแรง ${last.severity}/5`}</p></div>
+            <div><small>อาการหลัก</small><strong>{patient.summary.symptom}</strong><p>ติดตามมา {patient.sessions.length} Session</p></div>
           </article>
           <article className="summary-card">
             <span className="summary-icon summary-amber"><Icon name="brain" /></span>
