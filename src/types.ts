@@ -35,10 +35,15 @@ export type KgNode = {
   score?: string;
   /** Words used to match questions to this node in the KG chat. */
   keywords: string[];
+  /** ISO date of the clinician's latest correction. Set by the server; absent while the node is as first extracted. */
+  editedAt?: string;
 };
 
 /** A directed edge: [from node id, to node id, relation label]. */
 export type KgEdge = [from: string, to: string, relation: string];
+
+/** A patient's whole Knowledge Graph. */
+export type KgGraph = { nodes: KgNode[]; edges: KgEdge[] };
 
 export type SessionRecord = { number: number; date: string; duration: number; summary: string; insight: string };
 

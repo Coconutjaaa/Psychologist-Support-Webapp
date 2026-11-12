@@ -31,7 +31,8 @@ src/
   features/
     auth/                Login (sign in / sign up)
     clinician/           ClinicianApp (data + dialogs), nav rail, patient list, dashboard, schedule, modals
-    workspace/           one patient's case: PatientWorkspace, tabs, KgChat, KnowledgeGraph (+ graphLayout.ts), TranscriptModal
+    workspace/           one patient's case: PatientWorkspace, tabs, KgChat, KnowledgeGraph (+ graphLayout.ts), NodeEditModal
+                         (clinician corrections to a KG node and its edges), TranscriptModal
     patient/             PatientApp, MoodCheckin, CheckinChat, PatientSidebar, dialogs, moodStats.ts
   assets/logo-mark.png   logo mark shown by components/Brand (header, login)
   index.css              all styles; table of contents at the top

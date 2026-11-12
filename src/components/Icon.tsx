@@ -9,6 +9,7 @@ export type IconName =
   | "clock"
   | "close"
   | "download"
+  | "edit"
   | "file"
   | "graph"
   | "home"
@@ -43,6 +44,7 @@ export default function Icon({ name, size = 20 }: { name: IconName; size?: numbe
     clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
     close: <><path d="M18 6 6 18M6 6l12 12" /></>,
     download: <><path d="M12 3v13M7 11l5 5 5-5" /><path d="M5 21h14" /></>,
+    edit: <><path d="M21.2 6.8a2.8 2.8 0 0 0-4-4L3.8 16.2 3 21l4.8-.8Z" /><path d="m15 5 4 4" /></>,
     file: <><path d="M6 3h8l4 4v14H6Z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></>,
     graph: <><circle cx="5" cy="12" r="2" /><circle cx="17" cy="6" r="2" /><circle cx="18" cy="18" r="2" /><path d="m7 11 8-4M7 13l9 4M17 8l1 8" /></>,
     home: <><path d="m3 11 9-8 9 8" /><path d="M5 10v11h14V10M9 21v-7h6v7" /></>,

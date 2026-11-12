@@ -1,6 +1,6 @@
 // REST implementation of the Api contract, used when VITE_API_URL is set.
 // Endpoints, bodies and error format are documented on each method in ./contract.ts.
-import type { Appointment, MoodLog, Note, Patient, PatientCheckins, PatientHome, PatientMessage, Preferences, RagAnswer, Session, SessionSummary, TranscriptLine, TranscriptUpload } from "../types";
+import type { Appointment, KgGraph, MoodLog, Note, Patient, PatientCheckins, PatientHome, PatientMessage, Preferences, RagAnswer, Session, SessionSummary, TranscriptLine, TranscriptUpload } from "../types";
 import { ApiError, type Api } from "./contract";
 import { currentSession } from "./session";
 
@@ -71,6 +71,8 @@ export function createHttpApi(baseUrl: string): Api {
     },
     kg: {
       ask: (patientId, question) => post<RagAnswer>(`/patients/${id(patientId)}/kg/ask`, { question }),
+      saveNode: (patientId, node, edges) => put<KgGraph>(`/patients/${id(patientId)}/kg/nodes/${id(node.id)}`, { node, edges }),
+      removeNode: (patientId, nodeId) => del<KgGraph>(`/patients/${id(patientId)}/kg/nodes/${id(nodeId)}`),
     },
     checkins: {
       forPatient: (patientId) => get<PatientCheckins>(`/patients/${id(patientId)}/checkins`),

@@ -6,7 +6,7 @@
     Design tokens · Base · Top bar & menus · Clinician shell · Case workspace header & tabs · KG chat search
     Summary cards · Knowledge Graph · Patient app · Responsive (for everything above)
     Login · Shared controls · Modal · Clinician pages · Patient workspace tabs · KG chat · Transcript
-    Patient app (more) · KG relations · Split sidebar · Loading & error states
+    Patient app (more) · KG relations · KG editing · Split sidebar · Loading & error states
   Colours: use the tokens in :root.
 */
 
@@ -619,6 +619,48 @@ button, select { cursor: pointer; }
 .relation-list .current { color: var(--ink); font-weight: 600; }
 .relation-list em { color: #427884; font-style: normal; font-weight: 600; white-space: nowrap; }
 .kg-source, .kg-tag { border-width: 1px; }
+
+/* Knowledge Graph editing (evidence panel button, edit dialog) */
+.evidence-top > div { flex: 1; min-width: 0; }
+.evidence-edit { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid var(--line-2); border-radius: 7px; background: white; color: var(--navy); font-size: 10px; font-weight: 600; }
+.evidence-edit:hover { border-color: #afd2d9; background: var(--teal-pale); }
+.edited-note { display: flex; align-items: center; gap: 4px; margin: 10px 0 0; color: #427884; font-size: 9px; font-weight: 600; }
+.node-form .field-label small { color: var(--subtle); font-weight: 400; }
+.node-form .field textarea { min-height: 72px; }
+.field.invalid textarea, .field.invalid select { border-color: #d9a2ab; box-shadow: 0 0 0 3px var(--rose-pale); }
+.edit-section { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--line); }
+.edit-section + .edit-section { margin-top: 2px; }
+.edit-section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+.edit-section-head h3 { margin: 0; color: var(--navy); font-size: 13px; }
+.edit-section-head > small { color: var(--muted); font-size: 10px; }
+.edit-hint { margin: 0 0 10px; color: var(--muted); font-size: 11px; }
+.line-picker { position: relative; display: grid; gap: 2px; max-height: 230px; overflow-y: auto; margin-bottom: 14px; padding: 4px; border: 1px solid var(--line-2); border-radius: 10px; }
+.line-picker button { display: flex; gap: 10px; align-items: flex-start; padding: 7px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font-size: 11px; line-height: 1.6; text-align: left; }
+.line-picker button:hover { background: var(--background); }
+.line-picker button.active { background: var(--teal-pale); box-shadow: inset 0 0 0 1px #9fcbd3; }
+.line-picker button > span:last-child { display: grid; gap: 1px; }
+.line-picker small { color: var(--muted); font-size: 9.5px; }
+.line-picker .clinician small { color: #427884; font-weight: 600; }
+.line-picker .clinician > span:last-child { color: #4e5765; }
+.edge-rows { display: grid; gap: 8px; }
+.edge-row { padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #fcfcfd; }
+.edge-row.invalid { border-color: #d9a2ab; background: #fff9fa; }
+.edge-controls { display: grid; grid-template-columns: 118px minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.edge-controls select, .edge-controls input { min-width: 0; height: 36px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: 8px; outline: 0; background: white; color: var(--ink); font-size: 12px; }
+.edge-controls select:focus, .edge-controls input:focus { border-color: #7cb2bd; box-shadow: 0 0 0 3px var(--teal-pale); }
+.edge-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 5px; margin: 7px 2px 0; color: #4e5765; font-size: 10px; line-height: 1.45; }
+.edge-preview em { color: #427884; font-style: normal; font-weight: 600; white-space: nowrap; }
+.edge-preview .current { color: var(--ink); font-weight: 600; }
+.add-edge { margin-top: 10px; font-size: 11px; }
+.add-edge:disabled { color: var(--subtle); cursor: not-allowed; text-decoration: none; }
+.secondary-button.danger { color: var(--rose); border-color: #e6c3c9; }
+.secondary-button.danger:hover:not(:disabled) { background: var(--rose-pale); }
+.form-error { margin-top: 14px; }
+@media (max-width: 820px) {
+  .edge-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .edge-controls .icon-button { justify-self: end; }
+  .danger-zone { flex-wrap: wrap; }
+}
 
 /* Split sidebar: hideable patient list */
 .app-shell { transition: grid-template-columns .2s ease; }

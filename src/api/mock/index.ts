@@ -4,7 +4,7 @@
 import { clinician, patients as demoPeople } from "../../config";
 import { byDateTime, nowTime, todayIso } from "../../lib/date";
 import { initials } from "../../lib/labels";
-import type { Appointment, MoodLog, Note, Patient, PatientColor, PatientMessage, Preferences, Session, TranscriptUpload } from "../../types";
+import type { Appointment, KgGraph, MoodLog, Note, Patient, PatientColor, PatientMessage, Preferences, Session, TranscriptUpload } from "../../types";
 import { ApiError, type Api, type DemoAccount } from "../contract";
 import { currentSession } from "../session";
 import { askKg } from "./rag";
@@ -23,6 +23,7 @@ const keys = {
   accounts: "mindflow-accounts",
   addedPatients: `${DEMO_PREFIX}patients-added`,
   appointments: `${DEMO_PREFIX}appointments`,
+  graphs: `${DEMO_PREFIX}kg`,
   notes: `${DEMO_PREFIX}notes`,
   uploads: `${DEMO_PREFIX}uploads`,
   chat: (email: string) => `${DEMO_PREFIX}chat:${email}`,
@@ -59,7 +60,14 @@ function signedInUser() {
   return session;
 }
 
-const allPatients = () => [...seedPatients, ...read<Patient[]>(keys.addedPatients, [])];
+// A Knowledge Graph the clinician has corrected is stored whole and replaces the seeded (or added) one.
+const readGraphs = () => read<Record<string, KgGraph>>(keys.graphs, {});
+const saveGraph = (patientId: string, graph: KgGraph) => write(keys.graphs, { ...readGraphs(), [patientId]: graph });
+
+const allPatients = () => {
+  const graphs = readGraphs();
+  return [...seedPatients, ...read<Patient[]>(keys.addedPatients, [])].map((patient) => (graphs[patient.id] ? { ...patient, ...graphs[patient.id] } : patient));
+};
 
 function findPatient(id: string) {
   const patient = allPatients().find((item) => item.id === id);
@@ -177,6 +185,29 @@ export function createMockApi(): Api {
       async ask(patientId, question) {
         await wait(KG_ANSWER_MS);
         return askKg(findPatient(patientId), question);
+      },
+      async saveNode(patientId, node, edges) {
+        const { nodes, edges: current } = findPatient(patientId);
+        if (!nodes.some((item) => item.id === node.id)) throw new ApiError("ไม่พบประเด็นนี้ใน Knowledge Graph", 404);
+        if (!node.label.trim()) throw new ApiError("กรุณากรอกชื่อประเด็น", 400, "label");
+        if (nodes.some((item) => item.id !== node.id && item.col === node.col && item.row === node.row)) throw new ApiError("ตำแหน่งนี้มีประเด็นอื่นอยู่แล้ว", 409, "position");
+        const ids = new Set(nodes.map((item) => item.id));
+        const pairs = new Set(edges.map(([from, to]) => `${from}>${to}`));
+        if (pairs.size < edges.length || edges.some(([from, to]) => from === to || (from !== node.id && to !== node.id) || !ids.has(from) || !ids.has(to))) {
+          throw new ApiError("เส้นเชื่อมไม่ถูกต้อง", 400, "edges");
+        }
+        const graph: KgGraph = {
+          nodes: nodes.map((item) => (item.id === node.id ? { ...node, editedAt: todayIso() } : item)),
+          edges: [...current.filter(([from, to]) => from !== node.id && to !== node.id), ...edges],
+        };
+        saveGraph(patientId, graph);
+        return graph;
+      },
+      async removeNode(patientId, nodeId) {
+        const { nodes, edges } = findPatient(patientId);
+        const graph: KgGraph = { nodes: nodes.filter((item) => item.id !== nodeId), edges: edges.filter(([from, to]) => from !== nodeId && to !== nodeId) };
+        saveGraph(patientId, graph);
+        return graph;
       },
     },
 

@@ -9,10 +9,11 @@ import { columns, gridLayout, MIN_WIDTH, NODE_H, roundedPath, route, STAGE_H, ty
 
 export type GraphView = "แผนผัง" | "ลำดับเวลา";
 
-/** The Knowledge Graph card: a node diagram with an evidence panel, or a session timeline. */
-export default function KnowledgeGraph({ patient, selected, onSelect, session, onSession, view, onView, onOpenTranscript, onUpload }: {
+/** The Knowledge Graph card: a node diagram with an evidence panel (where the selected node can be edited), or a session timeline. */
+export default function KnowledgeGraph({ patient, selected, onSelect, session, onSession, view, onView, onOpenTranscript, onUpload, onEdit }: {
   patient: Patient; selected: string; onSelect: (id: string) => void; session: string; onSession: (session: string) => void;
   view: GraphView; onView: (view: GraphView) => void; onOpenTranscript: (session: number, nodeId?: string) => void; onUpload: () => void;
+  onEdit: (nodeId: string) => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasWidth, setCanvasWidth] = useState(680);
@@ -131,7 +132,9 @@ export default function KnowledgeGraph({ patient, selected, onSelect, session, o
             <div className="evidence-top">
               <span className="evidence-icon"><Icon name={detail.type === "ปัจจัยปกป้อง" ? "people" : "activity"} size={18} /></span>
               <div><small>{detail.category}</small><h3>{detail.label}</h3></div>
+              <button className="evidence-edit" title="แก้ไขเนื้อหา หลักฐาน และเส้นเชื่อมของประเด็นนี้" onClick={() => onEdit(detail.id)}><Icon name="edit" size={13} />แก้ไข</button>
             </div>
+            {detail.editedAt && <p className="edited-note"><Icon name="check" size={13} />แก้ไขโดยนักจิตวิทยา · {thaiDate(detail.editedAt)}</p>}
             {detail.score && <div className="trend-pill"><Icon name="arrow" size={15} />{detail.score}</div>}
             <div className="evidence-label"><span>หลักฐานจากบทสนทนา</span><small>Session {detail.session} · {detail.time}</small></div>
             <blockquote>{detail.quote}</blockquote>
