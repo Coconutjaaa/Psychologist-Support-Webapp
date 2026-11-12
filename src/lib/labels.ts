@@ -10,6 +10,9 @@ export const moodLabels = ["", "แย่มาก", "ไม่ค่อยด�
 /** CSS tone (`tone-*` classes in index.css) for each Knowledge Graph node type. */
 export const toneOf: Record<NodeType, string> = { เหตุการณ์: "lavender", ความคิด: "amber", อารมณ์: "rose", พฤติกรรม: "sky", อาการ: "coral", ปัจจัยปกป้อง: "mint" };
 
+/** Every Knowledge Graph node type, in the order the edit form lists them. */
+export const nodeTypes = Object.keys(toneOf) as NodeType[];
+
 /** Avatar text for a Thai display name: "ดร" for doctors, otherwise the first consonant after "คุณ". */
 export function initials(name: string) {
   if (name.startsWith("ดร")) return "ดร";

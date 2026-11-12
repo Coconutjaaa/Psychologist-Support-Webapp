@@ -4,10 +4,11 @@ import Icon from "../../components/Icon";
 import { useApiAction, useToast } from "../../components/Toast";
 import { features } from "../../config";
 import useResource from "../../hooks/useResource";
-import type { Appointment, KgChatMessage, Patient, TranscriptUpload } from "../../types";
+import type { Appointment, KgChatMessage, KgEdge, KgGraph, KgNode, Patient, TranscriptUpload } from "../../types";
 import GraphTab from "./GraphTab";
 import KgChat from "./KgChat";
 import type { GraphView } from "./KnowledgeGraph";
+import NodeEditModal from "./NodeEditModal";
 import NotesTab from "./NotesTab";
 import OverviewTab from "./OverviewTab";
 import SessionsTab from "./SessionsTab";
@@ -17,9 +18,11 @@ const tabs = ["ภาพรวม", "Sessions", "Knowledge Graph", "บันท
 type Tab = (typeof tabs)[number];
 
 /** One patient's case: header, KG chat, and the four tabs. Remounted (key = patient id) when switching patients. */
-export default function PatientWorkspace({ patient, appointment, chat, onChatChange, onSchedule, onShowList }: {
+export default function PatientWorkspace({ patient, appointment, chat, onChatChange, onSchedule, onShowList, onGraphChange }: {
   patient: Patient; appointment?: Appointment; chat: KgChatMessage[]; onShowList?: () => void;
   onChatChange: (update: (messages: KgChatMessage[]) => KgChatMessage[]) => void; onSchedule: (appointment?: Appointment) => void;
+  /** The Knowledge Graph after a correction was saved. */
+  onGraphChange: (graph: KgGraph) => void;
 }) {
   const notify = useToast();
   const run = useApiAction();
@@ -31,6 +34,8 @@ export default function PatientWorkspace({ patient, appointment, chat, onChatCha
   const [session, setSession] = useState("ทั้งหมด");
   const [view, setView] = useState<GraphView>("แผนผัง");
   const [transcript, setTranscript] = useState<TranscriptTarget | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = patient.nodes.find((node) => node.id === editingId);
   const uploadRef = useRef<HTMLInputElement>(null);
   const graphRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +50,21 @@ export default function PatientWorkspace({ patient, appointment, chat, onChatCha
     run(() => api.transcripts.upload(patient.id, file), (saved: TranscriptUpload) => {
       uploads.mutate((list) => [saved, ...list]);
       notify(`อัปโหลด ${file.name} แล้ว · รอประมวลผลเพื่ออัปเดต Knowledge Graph`);
+    });
+  const saveNode = (node: KgNode, edges: KgEdge[]) =>
+    run(() => api.kg.saveNode(patient.id, node, edges), (graph) => {
+      onGraphChange(graph);
+      setEditingId(null);
+      // The node may have moved to a later session than the one on screen; show every session so it stays visible.
+      if (node.since > (session === "ทั้งหมด" ? Infinity : Number(session.replace("Session ", "")))) setSession("ทั้งหมด");
+      notify("บันทึกการแก้ไข Knowledge Graph แล้ว");
+    });
+  const removeNode = (node: KgNode) =>
+    run(() => api.kg.removeNode(patient.id, node.id), (graph) => {
+      onGraphChange(graph);
+      setEditingId(null);
+      setSelected(graph.nodes[0]?.id ?? "");
+      notify(`ลบประเด็น ${node.label} ออกจาก Knowledge Graph แล้ว`);
     });
 
   const uploadCount = uploads.data?.length ?? 0;
@@ -76,11 +96,12 @@ export default function PatientWorkspace({ patient, appointment, chat, onChatCha
         {tab === "ภาพรวม" && <OverviewTab patient={patient} appointment={appointment} onSchedule={onSchedule} onOpenTranscript={(number) => setTranscript({ session: number })} />}
         {tab === "Sessions" && <SessionsTab patient={patient} uploads={uploads} onUpload={chooseFile} onOpenTranscript={(number) => setTranscript({ session: number })} onOpenUpload={(item) => setTranscript({ upload: item })} onShowInGraph={showSessionInGraph} />}
         {tab === "Knowledge Graph" && (
-          <GraphTab ref={graphRef} patient={patient} selected={selected} onSelect={setSelected} session={session} onSession={setSession} view={view} onView={setView} onOpenTranscript={openTranscript} onUpload={chooseFile} />
+          <GraphTab ref={graphRef} patient={patient} selected={selected} onSelect={setSelected} session={session} onSession={setSession} view={view} onView={setView} onOpenTranscript={openTranscript} onUpload={chooseFile} onEdit={setEditingId} />
         )}
         {tab === "บันทึก" && <NotesTab patientId={patient.id} notes={notes} />}
       </div>
       {transcript && <TranscriptModal patient={patient} target={transcript} onClose={() => setTranscript(null)} />}
+      {editing && <NodeEditModal patient={patient} node={editing} onSave={saveNode} onRemove={() => removeNode(editing)} onClose={() => setEditingId(null)} />}
     </>
   );
 }

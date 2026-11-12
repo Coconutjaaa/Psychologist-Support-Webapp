@@ -7,6 +7,8 @@ export type Box = { x: number; y: number; w: number; node: KgNode };
 
 /** Column headings, left to right (KgNode.col indexes into this). */
 export const columns = ["สิ่งที่เกิดขึ้น", "ภายในใจ", "การตอบสนอง", "ผลที่ตามมา"];
+/** Rows per column (KgNode.row is 0 to ROWS - 1); STAGE_H is sized to fit them. */
+export const ROWS = 3;
 export const NODE_H = 56;
 export const ROW_TOP = 58;
 export const ROW_PITCH = 96;

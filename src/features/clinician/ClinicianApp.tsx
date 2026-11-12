@@ -85,6 +85,7 @@ export default function ClinicianApp({ session }: { session: Session }) {
               onChatChange={(update) => setChats((current) => ({ ...current, [active.id]: update(current[active.id] ?? []) }))}
               onSchedule={(appointment) => schedule(appointment ?? { patientId: active.id })}
               onShowList={listHidden ? () => setListHidden(false) : undefined}
+              onGraphChange={(graph) => patients.mutate((list) => list.map((item) => (item.id === active.id ? { ...item, ...graph } : item)))}
             />
           </main>
         </>

@@ -1,6 +1,9 @@
 import type {
   Appointment,
   AppointmentInput,
+  KgEdge,
+  KgGraph,
+  KgNode,
   MoodLog,
   NewPatientInput,
   Note,
@@ -77,6 +80,16 @@ export interface Api {
   kg: {
     /** POST /patients/:id/kg/ask `{ question }` → RagAnswer, answered only from that patient's Knowledge Graph */
     ask(patientId: string, question: string): Promise<RagAnswer>;
+    /**
+     * PUT /patients/:id/kg/nodes/:nodeId `{ node, edges }` → KgGraph (the whole graph after the change).
+     * A clinician's correction: replaces the node, and every edge that touches it with `edges` (each has this node at
+     * one end); other nodes and edges are kept. The server sets `editedAt`, and should keep corrected nodes when it
+     * later rebuilds the graph from a new transcript. Fails with field "label" (empty), "position" (col/row taken by
+     * another node) or "edges" (an edge to a missing node, to itself, or twice to the same node).
+     */
+    saveNode(patientId: string, node: KgNode, edges: KgEdge[]): Promise<KgGraph>;
+    /** DELETE /patients/:id/kg/nodes/:nodeId → KgGraph, without the node and its edges */
+    removeNode(patientId: string, nodeId: string): Promise<KgGraph>;
   };
   checkins: {
     /** GET /patients/:id/checkins → PatientCheckins (mood log and check-in chat from the patient's app) */
